@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vue响应式的例子</title>
+</head>
+
+<body>
+
+  <div id="app">
+    <h1>请打开控制台观察数据变动</h1>
+    <p>本示例我们定义个一个对象 obj,
+      使用 defineProperty 代理了 count 属性。
+      这样我们就对 obj 对象的 value 属性实现了拦截，读取 count 属性的时候执行 get 函数,
+      修改 count 属性的时候执行 set 函数，并在 set 函数内部重新计算了 double
+    </p>
+    <p>
+      演示了删除对象的属性,defineProperty监听不到的缺陷
+    </p>
+    <button @click="changeCount">点击改变count值</button>
+    <button @click="deleteCount">点击删除count属性</button>
+  </div>
+  <script src="https://unpkg.com/vue@next"></script>
+  <script>
+    let App = {
+      setup() {
+        let calDouble = n => n * 2 //定义计算double的函数
+        let obj = {}
+        let count = 1;  //储存count变量的值
+        let double = calDouble(count) // 根据count初始化的值第一次计算出double
+        console.log('double的值为',double)
+        Object.defineProperty(obj, 'count', {
+          get() {
+            console.log('get count',count)
+            return count
+          },
+          set(val) {
+            console.log('set count',val)
+            count = val;// 更新count
+            double = calDouble(val) // 响应式更新double值
+          }
+        })
+        // 改变count的值
+        let changeCount = ()=>{
+          console.log('改变count的值为2')
+          obj.count = 2;
+          console.log('double的值为',double)
+        }
+        // 删除count属性
+        let deleteCount = ()=>{
+          console.log('删除count属性')
+          delete obj.count
+          console.log('double的值为',double)
+        }
+
+        return {changeCount,deleteCount}
+      }
+    }
+    Vue.createApp(App).mount('#app')
+  </script>
+</body>
+
+</html>

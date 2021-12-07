@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vue响应式的例子</title>
+</head>
+
+<body>
+
+  <div id="app">
+    <h1>请打开控制台观察数据变动</h1>
+    <p>Proxy 的重要意义在于它解决了 Vue 2 响应式的缺陷。
+      我们看下面的代码,在其中我们通过 new Proxy 代理了 obj 这个对象,
+      然后通过 get、set 和 deleteProperty 函数代理了对象的读取、修改和删除操作,
+      从而实现了响应式的功能</p>
+      
+      <p>
+        我们从这里可以看出 Proxy 实现的功能和 Vue 2 的 definePropery 类似,
+        它们都能够在用户修改数据的时候触发 set 函数，从而实现自动更新 double 的功能。
+        而且 Proxy 还完善了几个 definePropery 的缺陷，比如说可以监听到属性的删除。
+        Proxy 是针对对象来监听，而不是针对某个具体属性，所以不仅可以代理那些定义时不存在的属性，
+        还可以代理更丰富的数据结构，比如 Map、Set 等，并且我们也能通过 deleteProperty 实现对删除操作的代理
+      </p>
+      <p>
+        演示了删除对象的属性,Proxy也能监听得到
+      </p>
+    <button @click="changeCount">点击改变count值</button>
+    <button @click="deleteCount">点击删除count属性</button>
+  </div>
+  <script src="https://unpkg.com/vue@next"></script>
+  <script>
+    let App = {
+      setup() {
+        let calDouble = n => n * 2 //定义计算double的函数
+        let obj = {};
+        let double = NaN;
+        console.log('double的值为',double)
+        let proxy = new Proxy(obj,{
+          get:function(target,prop) {
+            return target[prop]
+          },
+          set:function(target,prop,value){
+            target[prop]=value;
+            if(prop==='count'){
+              double=calDouble(value);
+            }
+          },
+          deleteProperty(target,prop){
+            delete target[prop]
+            if(prop === 'count'){
+              double = NaN
+            }
+          }
+          
+        })
+        
+        let changeCount = ()=>{ 
+          console.log('改变count的值为2')
+          proxy.count = 2;
+          console.log('double的值为',double)
+        }
+        // 删除count属性
+        let deleteCount = ()=>{
+          console.log('删除count属性')
+          delete proxy.count;
+          console.log('double的值为',double)
+        }
+        return {changeCount,deleteCount}
+      }
+    }
+    Vue.createApp(App).mount('#app')
+  </script>
+</body>
+
+</html>

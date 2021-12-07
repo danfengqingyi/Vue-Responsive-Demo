@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vue响应式的例子</title>
+</head>
+
+<body>
+
+  <div id="app">
+    <h1>请打开控制台观察数据变动</h1>
+    <p>
+      利用对象的 get 和 set 函数来进行监听.
+      这种响应式的实现方式,只能拦截某一个属性的修改,这也是Vue 3 中 ref 这个 API 的实现
+    </p>
+    <button @click="changeCount">点击改变count值</button>
+  </div>
+  <script src="https://unpkg.com/vue@next"></script>
+  <script>
+    let App = {
+      setup() {
+        let calDouble = n => n * 2 //定义计算double的函数
+        let _value = 1;  //储存count变量的值
+        let double = calDouble(_value) // 根据count初始化的值第一次计算出double
+        console.log('double的值为', double)
+        let count = {
+          get value(){
+            _value;
+          },
+          set value(val){
+            _value = val;
+            double = calDouble(val);
+            
+          }
+        }
+        // 改变count的值
+        let changeCount = () => {
+          console.log('改变count的值为2')
+          count.value = 2;
+          console.log('double的值为', double)
+        }
+
+        return { changeCount }
+      }
+    }
+    Vue.createApp(App).mount('#app')
+  </script>
+</body>
+
+</html>

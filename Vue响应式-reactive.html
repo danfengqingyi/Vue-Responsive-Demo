@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vue响应式的例子</title>
+</head>
+
+<body>
+
+  <div id="app">
+    <h1>请打开控制台观察数据变动</h1>
+    <p>
+      演示了reactive实现响应式的方式
+      Vue 3 的 reactive 函数可以把一个对象变成响应式数据，而 reactive 就是基于 Proxy 实现的
+    </p>
+    <p>
+      演示了reactive封装的响应式对象在删除属性后,也能响应到数据的变化。
+      也可以监听到新增加的属性的变化。
+    </p>
+    <button @click="changeCount">点击改变count值</button>
+    <button @click="deleteCount">点击删除count属性</button>
+  </div>
+  <script src="https://unpkg.com/vue@next"></script>
+  <script>
+    const { reactive, computed, watchEffect } = Vue;
+    let App = {
+      setup() {
+        let obj = reactive({
+          count: 1  //此行去掉也可以
+        })
+        let double = computed(() => obj.count * 2)
+        let changeCount = () => {
+          console.log('改变count的值为2')
+          obj.count = 2
+        }
+        let deleteCount = () => {
+          console.log('删除count属性')
+          delete obj.count;
+        }
+
+
+        watchEffect(() => {
+          console.log('double的值为', double.value)
+        })
+        return { changeCount, deleteCount }
+      }
+    }
+    Vue.createApp(App).mount('#app')
+  </script>
+</body>
+
+</html>
